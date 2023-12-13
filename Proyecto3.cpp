@@ -11,6 +11,14 @@
 #include <chrono>
 #include <unordered_map>
 #include <limits>
+#include <stack>
+
+#define minCola 100000
+#define maxCola 110000
+#define minObjetos 15000
+#define maxObjetos 22500
+#define minEventos 60000
+#define maxEventos 80000
 
 using namespace std;
 using std::chrono::high_resolution_clock;
@@ -37,8 +45,9 @@ double shellSort(vector<int>& arr, int n);
 
 void merge(vector<int>& arr, int left, int mid, int right);
 void mergeSort(vector<int>& arr, int left, int right);
-int partition(vector<int>& arr, int start, int end);
-void quickSort(vector<int>& arr, int start, int end);
+int partition(vector<int>& arr, int bajo, int alto);
+void swap(int& a, int& b);
+void quickSort(vector<int>& arr, int low, int high);
 void heapify(vector<int>& arr, int n, int i);
 void heapSort(vector<int>& arr, int n);
 
@@ -49,6 +58,7 @@ int main()
 	vector<int> ColadeEspera;
 	vector<int> Objetos;
 	vector<int> Eventos;
+
 	vector<int> auxiliar;
 
 	double menor = numeric_limits<double>::infinity();
@@ -66,7 +76,8 @@ int main()
 
     do
     {
-        cout << endl;
+		cout << "////       Carrera de algoritmos      ////";
+        cout << endl << endl;
         cout << "1. Iniciar carrera (Cola de espera)\n2. Iniciar carrera (Objetos)\n3. Iniciar carrera (Eventos)\n4. Salir\n\n";
         cin >> opcion1;
 		cin.ignore();
@@ -96,7 +107,6 @@ int main()
 				resultados["Quick sort"] = obtenerTiempoQuickSort(auxiliar);
 				auxiliar = ColadeEspera;
 				resultados["Heap sort"] = obtenerTiempoHeapSort(auxiliar);
-
 				for (const auto& par : resultados) 
 				{
 					cout << "\nAlgoritmo: " << par.first << ", Tiempo: " << par.second << " segundos" << endl;
@@ -114,6 +124,7 @@ int main()
 				break;
 			case 2:
 				system("cls");
+				cout << "flag1\n";
 				ColadeEspera = AleatorioRepetido(ColadeEspera.size());
 				auxiliar = ColadeEspera;
 				resultados["Bubble sort"] = bubbleSort(auxiliar, auxiliar.size());
@@ -361,6 +372,8 @@ int main()
 				cout << "Opcion invalida...\n";
 				break;
 			}
+			system("pause");
+			system("cls");
 			break;
 		case 3:
 			system("cls");
@@ -506,6 +519,7 @@ int main()
 				break;
 			}
 			system("pause");
+			system("cls");
             break;
 		case 4:
 			exit(1);
@@ -522,23 +536,18 @@ int main()
 }
 double bubbleSort(vector<int>& arr, int n)
 {
+	int i, j, temp;
 	auto inicio = high_resolution_clock::now();
-	int i, j;
-	bool cambiado;
-	for (i = 0; i < n - 1; i++) 
+	for (i = 1; i < n; i++) 
 	{
-		cambiado = false;
-		for (j = 0; j < n - i - 1; j++) 
+		for (j = 0; j < n - i; j++) 
 		{
-			if (arr[j] > arr[j + 1]) 
+			if (arr[j] > arr[j + 1])
 			{
-				swap(arr[j], arr[j + 1]);
-				cambiado = true;
+				temp = arr[j];
+				arr[j] = arr[j+1];
+				arr[j+1] = temp;
 			}
-		}
-		if (cambiado == false)
-		{
-			break;
 		}
 	}
 	auto fin = high_resolution_clock::now();
@@ -546,21 +555,22 @@ double bubbleSort(vector<int>& arr, int n)
 }
 double selectionSort(vector<int>& arr, int n)
 {
+	int i, j, indiceMinimo;
 	auto inicio = high_resolution_clock::now();
-	int i, j, min_idx;
 	for (i = 0; i < n - 1; i++) 
 	{
-		min_idx = i;
+		indiceMinimo = i;
 		for (j = i + 1; j < n; j++) 
 		{
-			if (arr[j] < arr[min_idx])
+			if (arr[j] < arr[indiceMinimo])
 			{
-				min_idx = j;
+				indiceMinimo = j;
 			}
 		}
-		if (min_idx != i)
+
+		if (indiceMinimo != i)
 		{
-			swap(arr[min_idx], arr[i]);
+			swap(arr[indiceMinimo], arr[i]);
 		}
 	}
 	auto fin = high_resolution_clock::now();
@@ -662,52 +672,47 @@ void mergeSort(vector<int>& array, int const begin, int const end)
 	mergeSort(array, mid + 1, end);
 	merge(array, begin, mid, end);
 }
-int partition(vector<int>& arr, int start, int end)
+void swap(int& a, int& b)
 {
-
-	int pivote = arr[start];
-
-	int contador = 0;
-	for (int i = start + 1; i <= end; i++) 
-	{
-		if (arr[i] <= pivote)
-			contador++;
-	}
-
-	int indicePivote = start + contador;
-	swap(arr[indicePivote], arr[start]);
-
-	int i = start, j = end;
-
-	while (i < indicePivote && j > indicePivote) {
-
-		while (arr[i] <= pivote) {
-			i++;
-		}
-
-		while (arr[j] > pivote) {
-			j--;
-		}
-
-		if (i < indicePivote && j > indicePivote) {
-			swap(arr[i++], arr[j--]);
-		}
-	}
-
-	return indicePivote;
+	int temp = a;
+	a = b;
+	b = temp;
 }
-void quickSort(vector<int>& arr, int start, int end)
+int partition(vector<int>& arr, int bajo, int alto) 
 {
-	if (start >= end)
+	int pivote = arr[alto];
+	int i = bajo - 1;
+
+	for (int j = bajo; j <= alto -1; ++j) 
 	{
-		return;
+		if (arr[j] < pivote) 
+		{
+			++i;
+			swap(arr[i], arr[j]);
+		}
 	}
 
-	int p = partition(arr, start, end);
+	swap(arr[i + 1], arr[alto]);
+	return (i + 1);
+}
+void quickSort(vector<int>& arr, int bajo, int alto) 
+{
+	stack<pair<int, int>> st;
+	st.push({ bajo, alto });
 
-	quickSort(arr, start, p - 1);
+	while (!st.empty())
+	{
+		bajo = st.top().first;
+		alto = st.top().second;
+		st.pop();
+		if (bajo < alto)
+		{
+			int indicePivote = partition(arr, bajo, alto);
 
-	quickSort(arr, p + 1, end);
+			st.push({ bajo, indicePivote - 1 });
+			st.push({ indicePivote + 1, alto });
+		}
+	}
 }
 void heapify(vector<int>& arr, int n, int i)
 {
@@ -764,12 +769,9 @@ vector<int> Ordenado(int tamano)
 {
 	vector<int> mi_vector;
 
-	random_device rd;
-	mt19937 generador(rd());
-
-	for (int i = 1; i <= tamano; ++i) 
+	for (int i = 0; i < tamano; ++i) 
 	{
-		mi_vector.push_back(i);
+		mi_vector.push_back(i+1);
 	}
 
 	return mi_vector;
@@ -777,9 +779,6 @@ vector<int> Ordenado(int tamano)
 vector<int> InversoOrdenado(int tamano)
 {
 	vector<int> mi_vector;
-
-	random_device rd;
-	mt19937 generador(rd());
 
 	for (int i = tamano; i >= 1; i--)
 	{
@@ -807,7 +806,7 @@ int generarTamanioCola()
 {
 	random_device rd;
 	mt19937 generador(rd());
-	uniform_int_distribution<int> distribucion(100000, 110000);
+	uniform_int_distribution<int> distribucion(minCola, maxCola);
 
 	return distribucion(generador);
 }
@@ -815,7 +814,7 @@ int generarTamanioObjetos()
 {
 	random_device rd;
 	mt19937 generador(rd());
-	uniform_int_distribution<int> distribucion(15000, 22500);
+	uniform_int_distribution<int> distribucion(minObjetos, maxObjetos);
 
 	return distribucion(generador);
 }
@@ -823,7 +822,7 @@ int generarTamanioEventos()
 {
 	random_device rd;
 	mt19937 generador(rd());
-	uniform_int_distribution<int> distribucion(60000, 80000);
+	uniform_int_distribution<int> distribucion(minEventos, maxEventos);
 
 	return distribucion(generador);
 }
