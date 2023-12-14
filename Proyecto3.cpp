@@ -13,6 +13,7 @@
 #include <limits>
 #include <stack>
 
+// Definición de maximos y minimos
 #define minCola 100000
 #define maxCola 110000
 #define minObjetos 15000
@@ -25,31 +26,39 @@ using std::chrono::high_resolution_clock;
 using std::chrono::duration;
 using std::chrono::duration_cast;
 
+//       PROTOTIPOS      //
+
+// Funciones para generar el tamaño para los vectores
 int generarTamanioCola();
 int generarTamanioObjetos();
 int generarTamanioEventos();
 
+// Funciones para ordenar vectores
 vector<int> Aleatorio(int tamano);
 vector<int> Ordenado(int tamano);
 vector<int> InversoOrdenado(int tamano);
 vector<int> AleatorioRepetido(int tamano);
 
+// Funciones para obtener el tiempo en algoritmos de ordenamiento logarítmico
 double obtenerTiempoMergeSort(vector<int>& arr);
 double obtenerTiempoQuickSort(vector<int>& arr);
 double obtenerTiempoHeapSort(vector<int>& arr);
 
+// Algoritmos de ordenamiento cuadrático
 double bubbleSort(vector<int>& arr, int n);
 double selectionSort(vector<int>& arr, int n);
 double insertionSort(vector<int>& arr, int n);
 double shellSort(vector<int>& arr, int n);
 
+// Algoritmos de ordenamiento logarítmico
 void merge(vector<int>& arr, int left, int mid, int right);
 void mergeSort(vector<int>& arr, int left, int right);
 int partition(vector<int>& arr, int bajo, int alto);
-void swap(int& a, int& b);
 void quickSort(vector<int>& arr, int low, int high);
 void heapify(vector<int>& arr, int n, int i);
 void heapSort(vector<int>& arr, int n);
+
+void swap(int& a, int& b);
 
 int main()
 {
@@ -64,6 +73,7 @@ int main()
 	double menor = numeric_limits<double>::infinity();
 	string clave_menor;
 
+	// Se guardarán los resultados en un unordered_map
 	unordered_map<string, double> resultados;
 
 	int tamanioCola = generarTamanioCola();
@@ -76,6 +86,7 @@ int main()
 
     do
     {
+		// Menú
 		cout << "////       Carrera de algoritmos      ////";
         cout << endl << endl;
         cout << "1. Iniciar carrera (Cola de espera)\n2. Iniciar carrera (Objetos)\n3. Iniciar carrera (Eventos)\n4. Salir\n\n";
@@ -90,7 +101,7 @@ int main()
 			cin.ignore();
 			switch (opcion2)
 			{
-			case 1:
+			case 1:  // Se ordena de forma aleatoria y se guardan los resultados en un unordered_map
 				system("cls");
 				ColadeEspera = Aleatorio(ColadeEspera.size());
 				auxiliar = ColadeEspera;
@@ -534,6 +545,9 @@ int main()
 
 	return 0;
 }
+
+//              FUNCIONES              //
+
 double bubbleSort(vector<int>& arr, int n)
 {
 	int i, j, temp;
